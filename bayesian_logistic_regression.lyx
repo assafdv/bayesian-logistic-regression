@@ -515,7 +515,7 @@ with multivariate normal prior with zero mean vector and covaraince matrix
 \begin_layout Standard
 \begin_inset Formula 
 \[
-p(\boldsymbol{w}_{k})=\mathcal{{N}}(\boldsymbol{0},\boldsymbol{I}_{p}s^{2})
+p(\boldsymbol{w}_{k})=\mathcal{{N}}(\boldsymbol{0},\Sigma_{p})=\mathcal{{N}}(\boldsymbol{0},\boldsymbol{I}_{p}s^{2})
 \]
 
 \end_inset
@@ -595,7 +595,31 @@ The unnormalized log posteriror is given by
 
 \end_inset
 
-The Hessian matrix is given by 
+The Hessian matrix is given by (see Section 5)
+\begin_inset Formula 
+\[
+H=\mathcal{X}D\mathcal{X}^{T}+\Sigma_{p}^{-1}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+\mathcal{D\in\mathbb{R}}^{N\times N},\mathcal{D}=diag(d_{1},d_{2},...,d_{N}),\:d_{i}=[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\mathbb{\mathcal{X}}\in\mathbb{R}^{d\times N},\mathcal{X}=[\boldsymbol{x}_{1},\boldsymbol{x}_{2},...,\boldsymbol{x}_{N}]
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -740,7 +764,7 @@ Denote
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-\mathcal{D\in\mathbb{R}}^{N\times N},\mathcal{D}=diag(d_{1},d_{2},...,d_{N}),\:d_{i}=[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})
+\mathcal{D\in\mathbb{R}}^{N\times N},\mathcal{D}=diag(d_{1},d_{2},...,d_{N}),\:d_{i}=[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]
 \end{equation}
 
 \end_inset
