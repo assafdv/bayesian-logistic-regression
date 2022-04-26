@@ -1,0 +1,777 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\begin_preamble
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Bayesian Logistic Regression 
+\end_layout
+
+\begin_layout Section
+Model Definition
+\end_layout
+
+\begin_layout Standard
+We observe a set of pairs 
+\begin_inset Formula $\mathcal{{D}}=\{(\boldsymbol{x}_{i},y_{i})|i=1,...,N\}$
+\end_inset
+
+, with 
+\begin_inset Formula $\boldsymbol{x}_{i}\in\mathbb{{R}}^{p}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{i}\in[0,1]$
+\end_inset
+
+ (a binary classification response).
+ we assume that the class-conditional probability of belonging to the 
+\begin_inset Quotes eld
+\end_inset
+
+1
+\begin_inset Quotes erd
+\end_inset
+
+ class is given by a nonlinear transformation of a linear function of 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+P(y=1|\boldsymbol{x},\boldsymbol{w})=\sigma(\boldsymbol{x}^{T}\boldsymbol{w}).
+\end{equation}
+
+\end_inset
+
+The most commonly used function 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is the logistic function:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\sigma(z)=\frac{1}{1+exp(-z)}.
+\end{equation}
+
+\end_inset
+
+The class-conditional probability can be formulated as Bernoulli distribution
+ with probability of success 
+\begin_inset Formula $p=\sigma(\boldsymbol{x}^{T}\boldsymbol{w})$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(y|\boldsymbol{x},\boldsymbol{w})=\left(\frac{1}{1+exp(-\boldsymbol{x}^{T}\boldsymbol{w})}\right)^{y_{i}}\left(\frac{exp(-\boldsymbol{x}^{T}\boldsymbol{w})}{1+exp(-\boldsymbol{x}^{T}\boldsymbol{w})}\right)^{1-y_{i}}
+\end{equation}
+
+\end_inset
+
+We further assume that that predictions for different 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ are independent given 
+\begin_inset Formula $\boldsymbol{w}$
+\end_inset
+
+, then the likelihood can be written
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w})=\prod_{i=1}^{N}p(y_{i}|\boldsymbol{x}_{i},\boldsymbol{w})=\prod_{i=1}^{N}\left(\frac{1}{1+exp(-\boldsymbol{x}_{i}^{T}\boldsymbol{w})}\right)^{y_{i}}\left(\frac{exp(-\boldsymbol{x}_{i}^{T}\boldsymbol{w})}{1+exp(-\boldsymbol{x}_{i}^{T}\boldsymbol{w})}\right)^{1-y_{i}}\label{eq:likelihood}
+\end{equation}
+
+\end_inset
+
+Since we are constructing a Bayesian model, we must assign a prior distribution
+ on the unknown variables in the model.
+ We choose zero mean normal priors with variance 
+\begin_inset Formula $s^{2}$
+\end_inset
+
+ for the weights 
+\begin_inset Formula $\boldsymbol{w}$
+\end_inset
+
+ which corresponds to weak information regarding the true parameters values.
+ I.e., 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\boldsymbol{w})=\mathcal{{N}}(w|\boldsymbol{0},\boldsymbol{\Sigma}_{p}).
+\end{equation}
+
+\end_inset
+
+Using Bayes theorem, the posterior distribution is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\boldsymbol{w}|\mathcal{{D}})=p(\boldsymbol{w}|\mathcal{{Y}},\mathcal{{X}})=\frac{p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w})p(\boldsymbol{w})}{p(\mathcal{{Y}}|\mathcal{{X}})}=\frac{p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w})p(\boldsymbol{w})}{\int{p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w})p(\boldsymbol{w})d\boldsymbol{w}}}.
+\end{equation}
+
+\end_inset
+
+To make predictions based the training data 
+\begin_inset Formula $\mathcal{{D}}$
+\end_inset
+
+ for a test point 
+\begin_inset Formula $\boldsymbol{x}_{*}$
+\end_inset
+
+we have 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(y_{*}|\boldsymbol{x}_{*},\mathcal{{D}})=\int p(y_{*}|\boldsymbol{w},\boldsymbol{x}_{*},\mathcal{{D}})p(\boldsymbol{w}|\mathcal{{D}})\label{eq: predictive dist.}
+\end{equation}
+
+\end_inset
+
+We note that the posterior distribution, 
+\begin_inset Formula $p(\boldsymbol{w}|\mathcal{{D}})$
+\end_inset
+
+, does not belong to a nice parametric family.
+ Furthermore, the integral 
+\begin_inset Formula $p(y_{*}|\boldsymbol{x}_{*},\mathcal{{D}})$
+\end_inset
+
+ is intractable as well.
+ 
+\end_layout
+
+\begin_layout Section
+MAP Estimation 
+\end_layout
+
+\begin_layout Standard
+The MAP estimates, 
+\begin_inset Formula $\hat{\boldsymbol{w}}$
+\end_inset
+
+ is defined as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\hat{\boldsymbol{w}} & =arg\underset{w}{{max}}[p(\boldsymbol{w}|\mathcal{{D}})]=arg\underset{w}{{max}}[p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w})p(\boldsymbol{w})]=\nonumber \\
+ & =arg\underset{w}{{max}}\{\sum_{i=1}^{N}y_{i}log[\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]+\sum_{i=1}^{N}(1-y_{i})log[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]-0.5\boldsymbol{w}^{T}\Sigma_{p}\boldsymbol{w}\}
+\end{align}
+
+\end_inset
+
+we note that 
+\begin_inset Formula $\hat{\boldsymbol{w}}$
+\end_inset
+
+ has no simple analytic form.
+ However, it is easy to show that for some sigmoid functions, such as logistic
+ and cumulative Gaussian , the log likelihood (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:likelihood"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is a concave function of 
+\begin_inset Formula $\boldsymbol{w}$
+\end_inset
+
+ for fixed 
+\begin_inset Formula $\mathcal{{D}}.$
+\end_inset
+
+ As the quadratic term, 
+\begin_inset Formula $0.5\boldsymbol{w}^{T}\Sigma_{p}\boldsymbol{w}$
+\end_inset
+
+, is also concave then the log posterior is a concave function, which means
+ that it is relatively easy to find its unique maximum.
+ 
+\end_layout
+
+\begin_layout Standard
+Although finding the MAP is a fast and easy way of obtaining estimates of
+ the unknown model parameters, it is limited because there is no associated
+ estimate of uncertainty produced with the MAP estimates.
+ 
+\end_layout
+
+\begin_layout Section
+Laplace Approximation 
+\end_layout
+
+\begin_layout Standard
+The idea of Laplace approximation is to approximate the posterior density
+ with a Gaussian:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\boldsymbol{w}|\mathcal{{D}})\approx\mathcal{{N}}(\boldsymbol{w}|\boldsymbol{\mu},\boldsymbol{\Sigma})
+\end{equation}
+
+\end_inset
+
+The Laplace approximation is based on a second order Taylor expansion of
+ the negative log of the unnormalized posterior 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\Psi(\boldsymbol{w})=-\log p({D}|\boldsymbol{w})-\log p(\boldsymbol{w})
+\end{equation}
+
+\end_inset
+
+around the MAP estimate 
+\begin_inset Formula $\hat{\boldsymbol{w}}$
+\end_inset
+
+.
+ This results in the following Gaussian distribution 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\boldsymbol{w}|\mathcal{{D}})\approx\mathcal{{N}}(\boldsymbol{w}|\hat{\boldsymbol{w}},H^{-1})\label{eq:post approx}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $H$
+\end_inset
+
+ is the Hessian of 
+\begin_inset Formula $\Psi(\boldsymbol{w})$
+\end_inset
+
+ evaluated at 
+\begin_inset Formula $\hat{\boldsymbol{w}}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+H=\nabla\nabla\Psi(\boldsymbol{w})|_{\boldsymbol{w}=\hat{\boldsymbol{w}}}\label{eq:hessian def}
+\end{equation}
+
+\end_inset
+
+In the case of logistic regression, the Hessian is given by 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+H=\Sigma_{p}^{-1}+\sum_{i=1}^{N}\boldsymbol{x}_{i}\boldsymbol{x}_{i}^{T}\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{\hat{w}})[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{\hat{w}})]
+\end{equation}
+
+\end_inset
+
+To make a prediction, one needs the predictive distribution (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq: predictive dist."
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ However, the integral can not be computed analytically even with the Gaussian
+ approximation of the posterior (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:post approx"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ A numerical approximation can however be easily obtained by Monte Carlo
+ sampling (SLLN) 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(y_{*}|\boldsymbol{x}_{*},\mathcal{{D}})\approx\frac{1}{S}\sum_{i=1}^{S}\sigma(\boldsymbol{x}_{new}^{T}\boldsymbol{w}_{s})
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{w}_{s}$
+\end_inset
+
+ are independently sampled from 
+\begin_inset Formula $\mathcal{{N}}(\boldsymbol{w}|\hat{\boldsymbol{w}},H^{-1})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Multiclass logistic regression 
+\end_layout
+
+\begin_layout Standard
+In the multiclass logistic regression formulation, the responses are consdired
+ to be the set of 1-of-
+\begin_inset Formula $K$
+\end_inset
+
+ encoded random vectors 
+\series bold
+
+\begin_inset Formula $\boldsymbol{y}$
+\end_inset
+
+
+\series default
+ of dimension 
+\begin_inset Formula $K$
+\end_inset
+
+ having the property that exectly one element has the the value 1 and the
+ others have the value 0.
+ In this formulation, the response vector, 
+\begin_inset Formula $\boldsymbol{y}$
+\end_inset
+
+, can be modeled as categorial varaible, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P(\boldsymbol{y}|\boldsymbol{x},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})=\prod_{k=1}^{K}p_{k}^{y_{k}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $p_{k}$
+\end_inset
+
+ are the class conditional densities given by the softmax function, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p_{k}=P(C_{k}|\boldsymbol{x},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})\boldsymbol{=}\frac{\exp(\boldsymbol{w}_{k}^{T}\boldsymbol{x})}{\sum_{k'}\exp(\boldsymbol{w}_{k'}^{T}\boldsymbol{x})}
+\]
+
+\end_inset
+
+Assuming the data samples 
+\begin_inset Formula $\boldsymbol{x}_{n},\:n=1,...N$
+\end_inset
+
+ are statisticaly independent given , the likelihood can be written
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})=\prod_{n=1}^{N}p(\boldsymbol{y}_{n}|\boldsymbol{x}_{n},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})=\prod_{n=1}^{N}\prod_{k=1}^{K}\left(\frac{\exp(\boldsymbol{w}_{k}^{T}\boldsymbol{x}_{n})}{\sum_{k'}\exp(\boldsymbol{w}_{k'}^{T}\boldsymbol{x}_{n})}\right)^{y_{nk}}
+\]
+
+\end_inset
+
+since we are constructing a Bayesian model, we must assign a prior distribution
+ on the unknown variables in the model.
+ We model each weights vector 
+\begin_inset Formula $w_{\boldsymbol{k}}$
+\end_inset
+
+with multivariate normal prior with zero mean vector and covaraince matrix
+ variance 
+\begin_inset Formula $\boldsymbol{I}_{p}s^{2}$
+\end_inset
+
+ which corresponds to weak information regarding the true parameters values.
+ I.e.,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\boldsymbol{w}_{k})=\mathcal{{N}}(\boldsymbol{0},\boldsymbol{I}_{p}s^{2})
+\]
+
+\end_inset
+
+Since 
+\begin_inset Formula $\boldsymbol{w}_{k},k=1,..,K$
+\end_inset
+
+ are assumed statisticaly independent we obtain 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\boldsymbol{W})=p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})=\prod_{k=1}^{K}p(\boldsymbol{w}_{k})=\prod_{k=1}^{K}\mathcal{{N}}(\boldsymbol{0},\boldsymbol{I}_{p}s^{2})
+\]
+
+\end_inset
+
+Using Bayes theorem, the posterior distribution is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+p(\boldsymbol{W}|{D})=p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K}|\mathcal{{D}}) & =p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K}|\mathcal{{Y}},\mathcal{{X}})=\\
+ & =\frac{p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})}{p(\mathcal{{Y}}|\mathcal{{X}})}=\\
+ & =\frac{p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})}{\int{p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})d\boldsymbol{w}_{1}...d\boldsymbol{w}_{K}}}
+\end{align*}
+
+\end_inset
+
+To make predictions based on the training data 
+\begin_inset Formula $\mathcal{{D}}$
+\end_inset
+
+ for a test point 
+\begin_inset Formula $\boldsymbol{x}_{*}$
+\end_inset
+
+we have 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\boldsymbol{y}_{*}|\boldsymbol{x}_{*},\mathcal{{D}})=\int p(\boldsymbol{y}_{*}|\boldsymbol{x}_{*},\mathcal{{D}},\boldsymbol{W})p(\boldsymbol{W}|{D})
+\]
+
+\end_inset
+
+The MAP estimates, 
+\begin_inset Formula $\hat{\boldsymbol{w}_{k}}$
+\end_inset
+
+ is defined as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\hat{\boldsymbol{w}_{k}} & =\argmax_{\boldsymbol{w}_{k}}p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K}|\mathcal{{D}})=\argmax_{\boldsymbol{w}_{k}}\log p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K}|\mathcal{{D}})=\\
+ & =\argmax_{\boldsymbol{w}_{k}}\left[\log p(\mathcal{{Y}}|\mathcal{{X}},\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})+\log p(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})\right]\\
+ & =\argmax_{\boldsymbol{w}_{k}}\left[\sum_{n=1}^{N}\sum_{k=1}^{K}y_{nk}\log\frac{\exp(\boldsymbol{w}_{k}^{T}\boldsymbol{x}_{n})}{\sum_{k'}\exp(\boldsymbol{w}_{k'}^{T}\boldsymbol{x}_{n})}-0.5s^{-2}\sum_{k=1}^{K}\boldsymbol{w}_{k}^{T}\boldsymbol{w}_{k}\right]
+\end{align*}
+
+\end_inset
+
+The unnormalized log posteriror is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi(\boldsymbol{w}_{1},...,\boldsymbol{w}_{K})=-\sum_{n=1}^{N}\sum_{k=1}^{K}y_{nk}\log\frac{\exp(\boldsymbol{w}_{k}^{T}\boldsymbol{x}_{n})}{\sum_{k'}\exp(\boldsymbol{w}_{k'}^{T}\boldsymbol{x}_{n})}+0.5s^{-2}\sum_{k=1}^{K}\boldsymbol{w}_{k}^{T}\boldsymbol{w}_{k}
+\]
+
+\end_inset
+
+The Hessian matrix is given by 
+\end_layout
+
+\begin_layout Section
+Appendix A - Derivation of the Hessian Matrix 
+\end_layout
+
+\begin_layout Standard
+The Hessian Matrix is defined as follows 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+H=\nabla\nabla\Psi(\boldsymbol{w})=\frac{\partial\Psi(\boldsymbol{w})}{\partial w\partial w^{T}}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+for selecting 
+\begin_inset Formula $\Psi(\boldsymbol{w})$
+\end_inset
+
+ to be the unnormalized log posterior for the logistic regression model
+ we obtain 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+H=\frac{\partial\Psi(\boldsymbol{w})}{\partial\boldsymbol{w}\partial\boldsymbol{w}^{T}}=\frac{\partial}{\partial\boldsymbol{w}\partial\boldsymbol{w}^{T}}\left\{ -\sum_{i=1}^{N}y_{i}\log[\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]-\sum_{i=1}^{N}(1-y_{i})\log[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]+0.5\boldsymbol{w}^{T}\Sigma_{p}^{-1}\boldsymbol{w}\right\} \label{eq:hessian post}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We note the following properties of logistic function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+1-\sigma(z)=1-\frac{1}{1+exp(-z)}=\frac{exp(-z)}{1+exp(-z)}=\frac{1}{1+exp(z)}=\sigma(-z)\label{eq:logit prop1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\sigma(z)}{\partial z}=\frac{exp(-z)}{[1+exp(-z)]^{2}}=\frac{exp(-z)}{1+exp(-z)}\frac{1}{1+exp(-z)}=[1-\sigma(z)]\sigma(z)\label{eq:logit prop2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We start by taking the derivative of 
+\begin_inset Formula $\Psi(\boldsymbol{w})$
+\end_inset
+
+ with respect to 
+\begin_inset Formula $w^{T}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\frac{\partial\Psi(\boldsymbol{w})}{\partial\boldsymbol{w}^{T}} & =\frac{\partial}{\partial\boldsymbol{w}^{T}}\left\{ -\sum_{i=1}^{N}y_{i}\log[\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]-\sum_{i=1}^{N}(1-y_{i})\log[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]+0.5\boldsymbol{w}^{T}\Sigma_{p}^{-1}\boldsymbol{w}\right\} =\nonumber \\
+ & \underset{(\ref{eq:logit prop1})}{{=}}\frac{\partial}{\partial\boldsymbol{w}^{T}}\left\{ -\sum_{i=1}^{N}y_{i}\log[\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]-\sum_{i=1}^{N}(1-y_{i})\log[\sigma(-\boldsymbol{x}_{i}^{T}\boldsymbol{w})]+0.5\boldsymbol{w}^{T}\Sigma_{p}^{-1}\boldsymbol{w}\right\} \nonumber \\
+ & =-\sum_{i=1}^{N}y_{i}\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})^{-1}\frac{\partial}{\partial\boldsymbol{w}^{T}}\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})-\sum_{i=1}^{N}(1-y_{i})\sigma(\boldsymbol{-x}_{i}^{T}\boldsymbol{w})^{-1}\frac{\partial}{\partial\boldsymbol{w}^{T}}\sigma(-\boldsymbol{x}_{i}^{T}\boldsymbol{w})+\Sigma_{p}^{-1}\boldsymbol{w}=\label{eq:grad logp}\\
+ & =-\sum_{i=1}^{N}y_{i}[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\boldsymbol{x}_{i}+\sum_{i=1}^{N}(1-y_{i})\underset{=\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})}{{[1-\sigma(\boldsymbol{-x}_{i}^{T}\boldsymbol{w})]}}\boldsymbol{x}_{i}+\Sigma_{p}^{-1}\boldsymbol{w}=\nonumber \\
+ & =\sum_{i=1}^{N}\left\{ -y_{i}[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]+(1-y_{i})\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})\right\} \boldsymbol{x}_{i}+\Sigma_{p}^{-1}\boldsymbol{w}=\nonumber \\
+ & =\sum_{i=1}^{N}[-y_{i}+\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\boldsymbol{x}_{i}+\Sigma_{p}^{-1}\boldsymbol{w}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To obtain the Hessian matrix, we take the derivative of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:grad logp"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) with respect to 
+\begin_inset Formula $\boldsymbol{w}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+H & =\frac{\partial\Psi(\boldsymbol{w})}{\partial\boldsymbol{w}\partial\boldsymbol{w}^{T}}=\frac{\partial}{\partial\boldsymbol{w}}\left\{ \sum_{i=1}^{N}[-y_{i}+\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\boldsymbol{x}_{i}+\Sigma_{p}^{-1}\boldsymbol{w}\right\} =\nonumber \\
+ & =\sum_{i=1}^{N}\boldsymbol{x}_{i}\frac{\partial}{\partial\boldsymbol{w}}\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})+\Sigma_{p}^{-1}=\nonumber \\
+ & =\sum_{i=1}^{N}\boldsymbol{x}_{i}\boldsymbol{x}_{i}^{T}[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})+\Sigma_{p}^{-1}\label{eq: hessian log}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Denote
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\mathbb{\mathcal{X}}\in\mathbb{R}^{d\times N},\mathcal{X}=[\boldsymbol{x}_{1},\boldsymbol{x}_{2},...,\boldsymbol{x}_{N}]
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\mathcal{D\in\mathbb{R}}^{N\times N},\mathcal{D}=diag(d_{1},d_{2},...,d_{N}),\:d_{i}=[1-\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})]\sigma(\boldsymbol{x}_{i}^{T}\boldsymbol{w})
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq: hessian log"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) can be expressed as 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+H=\mathcal{X}D\mathcal{X}^{T}+\Sigma_{p}^{-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
